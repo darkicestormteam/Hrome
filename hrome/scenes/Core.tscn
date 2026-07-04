@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c7ctpanm43pd"]
+
+[ext_resource type="Script" uid="uid://dfv7g1132vrg8" path="res://scripts/Core.gd" id="1_myllb"]
+
+[node name="Core" type="Node2D" unique_id=1499505564]
+script = ExtResource("1_myllb")
+
+[node name="Visual" type="Polygon2D" parent="." unique_id=103441319]
+polygon = PackedVector2Array(0, -60, 52, 30, -52, 30)
+vertex_colors = PackedColorArray(1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1)
