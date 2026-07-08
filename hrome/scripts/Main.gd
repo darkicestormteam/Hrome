@@ -1,5 +1,5 @@
 extends Node2D
-## Главная сцена. Управляет UI, экраном Game Over, настройками и рестартом.
+## Главная сцена. Управляет UI, главным меню, экраном Game Over, настройками и рестартом.
 
 @onready var score_label: Label = $UI/ScoreLabel
 @onready var hp_label: Label = $UI/HPLabel
@@ -8,7 +8,7 @@ extends Node2D
 @onready var game_over_screen: Control = $UI/GameOverScreen
 @onready var final_score_label: Label = $UI/GameOverScreen/VBoxContainer/FinalScoreLabel
 @onready var restart_button: Button = $UI/GameOverScreen/VBoxContainer/RestartButton
-@onready var settings_button: Button = $UI/GameOverScreen/VBoxContainer/SettingsButton
+@onready var game_over_settings_button: Button = $UI/GameOverScreen/VBoxContainer/SettingsButton
 @onready var settings_screen: Control = $UI/SettingsScreen
 @onready var music_slider: HSlider = $UI/SettingsScreen/VBoxContainer/HBoxContainer/MusicSlider
 @onready var sfx_slider: HSlider = $UI/SettingsScreen/VBoxContainer/HBoxContainer2/SfxSlider
@@ -18,35 +18,91 @@ extends Node2D
 @onready var core: Node2D = $Core
 @onready var spawner: Node = $Spawner
 
+# Главное меню
+@onready var main_menu_screen: Control = $UI/MainMenuScreen
+@onready var play_button: Button = $UI/MainMenuScreen/VBoxContainer/PlayButton
+@onready var menu_settings_button: Button = $UI/MainMenuScreen/VBoxContainer/SettingsButton
+
 var gm: Node
 
 
 func _ready() -> void:
 	gm = get_node("/root/GameManager")
-	
+
 	var viewport_size: Vector2 = get_viewport_rect().size
 	core.global_position = viewport_size / 2.0
-	
+
 	gm.score_changed.connect(_on_score_changed)
 	gm.hp_changed.connect(_on_hp_changed)
 	gm.combo_changed.connect(_on_combo_changed)
 	gm.sector_changed.connect(_on_sector_changed)
 	gm.game_over.connect(_on_game_over)
-	
+
 	restart_button.pressed.connect(_on_restart_pressed)
-	settings_button.pressed.connect(_on_open_settings)
+	game_over_settings_button.pressed.connect(_on_open_settings)
 	close_settings_button.pressed.connect(_on_close_settings)
 	music_slider.value_changed.connect(_on_music_slider_changed)
 	sfx_slider.value_changed.connect(_on_sfx_slider_changed)
 	music_mute_button.pressed.connect(_on_music_mute_pressed)
 	sfx_mute_button.pressed.connect(_on_sfx_mute_pressed)
-	
+
+	play_button.pressed.connect(_on_play_button_pressed)
+	menu_settings_button.pressed.connect(_on_menu_settings_pressed)
+	play_button.mouse_entered.connect(_on_button_hover.bind(play_button))
+	play_button.mouse_exited.connect(_on_button_unhover.bind(play_button))
+	menu_settings_button.mouse_entered.connect(_on_button_hover.bind(menu_settings_button))
+	menu_settings_button.mouse_exited.connect(_on_button_unhover.bind(menu_settings_button))
+
 	_on_score_changed(gm.score)
 	_on_hp_changed(gm.hp)
 	_on_combo_changed(gm.combo_multiplier)
 	_on_sector_changed(gm.current_sector)
-	
+
+	# Стартуем в главном меню: прячем игровые экраны, замораживаем игру.
+	game_over_screen.visible = false
+	settings_screen.visible = false
+	gm.game_state = GameManager.GameState.MENU
+	main_menu_screen.visible = true
+	# Замораживаем игровые узлы (а не всё дерево), чтобы tween меню работал.
+	core.process_mode = Node.PROCESS_MODE_DISABLED
+	spawner.process_mode = Node.PROCESS_MODE_DISABLED
+	_animate_menu_in()
+
+
+func _animate_menu_in() -> void:
+	main_menu_screen.modulate = Color(1, 1, 1, 0)
+	main_menu_screen.scale = Vector2(0.9, 0.9)
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(main_menu_screen, "modulate", Color(1, 1, 1, 1), 0.3)
+	tween.parallel().tween_property(main_menu_screen, "scale", Vector2(1.0, 1.0), 0.3)
+
+
+func _on_button_hover(button: Button) -> void:
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "scale", Vector2(1.1, 1.1), 0.12)
+
+
+func _on_button_unhover(button: Button) -> void:
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(button, "scale", Vector2(1.0, 1.0), 0.12)
+
+
+func _on_play_button_pressed() -> void:
+	main_menu_screen.visible = false
+	core.process_mode = Node.PROCESS_MODE_INHERIT
+	spawner.process_mode = Node.PROCESS_MODE_INHERIT
 	gm.reset_game()
+
+
+func _on_menu_settings_pressed() -> void:
+	main_menu_screen.visible = false
+	settings_screen.visible = true
 
 
 func _on_score_changed(new_score: int) -> void:
@@ -106,7 +162,10 @@ func _on_open_settings() -> void:
 
 func _on_close_settings() -> void:
 	settings_screen.visible = false
-	game_over_screen.visible = true
+	if gm.game_state == GameManager.GameState.MENU:
+		main_menu_screen.visible = true
+	else:
+		game_over_screen.visible = true
 
 
 func _on_music_slider_changed(value: float) -> void:
