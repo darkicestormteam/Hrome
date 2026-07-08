@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://8metlyerr4ri"]
+
+[ext_resource type="Script" uid="uid://dale8ptrrn3ks" path="res://scripts/HitEffect.gd" id="1_dhkt0"]
+
+[node name="HitEffect" type="Node2D" unique_id=943659524]
+script = ExtResource("1_dhkt0")
+
+[node name="Particles" type="CPUParticles2D" parent="." unique_id=1906884674]
+emitting = false
+amount = 15
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 100.0
+scale_amount_min = 0.5
+scale_amount_max = 0.5

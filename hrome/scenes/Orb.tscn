@@ -15,3 +15,8 @@ texture = ExtResource("2_x580g")
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=1244855192]
 shape = SubResource("CircleShape2D_x580g")
+
+[node name="Trail" type="Line2D" parent="." unique_id=1576551239]
+width = 4.0
+joint_mode = 1
+end_cap_mode = 1
