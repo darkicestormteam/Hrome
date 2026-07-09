@@ -1,8 +1,13 @@
 [gd_scene format=3 uid="uid://c7ctpanm43pd"]
 
 [ext_resource type="Script" uid="uid://dfv7g1132vrg8" path="res://scripts/Core.gd" id="1_myllb"]
+[ext_resource type="Texture2D" uid="uid://dbnvbpkpnv0k1" path="res://assets/core_hex.png" id="2_dy3p5"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_roq8x"]
+blend_mode = 1
 
 [node name="Core" type="Node2D" unique_id=1499505564]
+scale = Vector2(1.5, 1.5)
 script = ExtResource("1_myllb")
 
 [node name="Visual" type="Node2D" parent="." unique_id=1933112193]
@@ -15,17 +20,9 @@ rotation = -4.1887903
 [node name="Collision" type="CollisionPolygon2D" parent="Visual/HexVisual/GreenSector" unique_id=1498482558]
 polygon = PackedVector2Array(0, 0, -48.313522, 20.38357, -6.7880955, -52.40775)
 
-[node name="Poly" type="Polygon2D" parent="Visual/HexVisual/GreenSector" unique_id=343263886]
-color = Color(0, 1, 0, 1)
-polygon = PackedVector2Array(0, 0, -48.313522, 20.38357, -6.7880955, -52.40775)
-
 [node name="BlueSector" type="Area2D" parent="Visual/HexVisual" unique_id=1748591531]
 
 [node name="Collision" type="CollisionPolygon2D" parent="Visual/HexVisual/BlueSector" unique_id=1892497405]
-polygon = PackedVector2Array(0, 0, 6.72764, -51.76203, 48.191048, 20.054718)
-
-[node name="Poly" type="Polygon2D" parent="Visual/HexVisual/BlueSector" unique_id=1806975171]
-color = Color(0, 0, 1, 1)
 polygon = PackedVector2Array(0, 0, 6.72764, -51.76203, 48.191048, 20.054718)
 
 [node name="RedSector" type="Area2D" parent="Visual/HexVisual" unique_id=1596837083]
@@ -33,17 +30,9 @@ polygon = PackedVector2Array(0, 0, 6.72764, -51.76203, 48.191048, 20.054718)
 [node name="Collision" type="CollisionPolygon2D" parent="Visual/HexVisual/RedSector" unique_id=1285855828]
 polygon = PackedVector2Array(0, 0, -41.809456, 31.648943, 41.58588, 31.37846)
 
-[node name="Poly" type="Polygon2D" parent="Visual/HexVisual/RedSector" unique_id=874328775]
-color = Color(1, 0, 0, 1)
-polygon = PackedVector2Array(0, 0, -41.809456, 31.648943, 41.58588, 31.37846)
-
 [node name="Gap1" type="Area2D" parent="Visual/HexVisual" unique_id=1760311533]
 
 [node name="Collision" type="CollisionPolygon2D" parent="Visual/HexVisual/Gap1" unique_id=396279643]
-polygon = PackedVector2Array(0, 0, 48.191048, 20.054718, 41.58588, 31.37846)
-
-[node name="Poly" type="Polygon2D" parent="Visual/HexVisual/Gap1" unique_id=352255878]
-color = Color(0.5, 0.5, 0.5, 1)
 polygon = PackedVector2Array(0, 0, 48.191048, 20.054718, 41.58588, 31.37846)
 
 [node name="Gap2" type="Area2D" parent="Visual/HexVisual" unique_id=1396709215]
@@ -51,15 +40,13 @@ polygon = PackedVector2Array(0, 0, 48.191048, 20.054718, 41.58588, 31.37846)
 [node name="Collision" type="CollisionPolygon2D" parent="Visual/HexVisual/Gap2" unique_id=533089987]
 polygon = PackedVector2Array(0, 0, -41.809456, 31.648943, -48.313522, 20.38357)
 
-[node name="Poly" type="Polygon2D" parent="Visual/HexVisual/Gap2" unique_id=1073412317]
-color = Color(0.5, 0.5, 0.5, 1)
-polygon = PackedVector2Array(0, 0, -41.809456, 31.648943, -48.313522, 20.38357)
-
 [node name="Gap3" type="Area2D" parent="Visual/HexVisual" unique_id=388489251]
 
 [node name="Collision" type="CollisionPolygon2D" parent="Visual/HexVisual/Gap3" unique_id=1752326487]
 polygon = PackedVector2Array(0, 0, 6.72764, -51.76203, -6.7880955, -52.40775)
 
-[node name="Poly" type="Polygon2D" parent="Visual/HexVisual/Gap3" unique_id=255447863]
-color = Color(0.5, 0.5, 0.5, 1)
-polygon = PackedVector2Array(0, 0, 6.72764, -51.76203, -6.7880955, -52.40775)
+[node name="CoreSprite" type="Sprite2D" parent="Visual" unique_id=346498524]
+material = SubResource("CanvasItemMaterial_roq8x")
+position = Vector2(-5.9604645e-08, -8)
+scale = Vector2(0.13870557, 0.14233124)
+texture = ExtResource("2_dy3p5")

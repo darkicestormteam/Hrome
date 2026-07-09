@@ -23,7 +23,7 @@ const COLORS: Array[String] = ["red", "blue", "green"]
 
 func _ready() -> void:
 	trail.top_level = true
-	trail.width = 3.0
+	# Ширина и кривая хвоста заданы в Orb.tscn (Width Curve + Gradient).
 	add_to_group("orb")
 
 
@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 
 	# Обновляем хвост
 	trail_points.append(global_position)
-	if trail_points.size() > 10:
+	if trail_points.size() > 30:
 		trail_points.pop_front()
 	trail.points = trail_points
 	trail.default_color = visual.modulate

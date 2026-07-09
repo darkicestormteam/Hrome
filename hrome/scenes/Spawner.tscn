@@ -4,6 +4,8 @@
 
 [node name="Spawner" type="Node" unique_id=1995988652]
 script = ExtResource("1_qcsvw")
+color_red = Color(0.9999917, 0.12389488, 0.09317883, 1)
+color_blue = Color(0.23137255, 0.45882353, 1, 1)
 
 [node name="SpawnTimer" type="Timer" parent="." unique_id=1468261707]
 wait_time = 1.4

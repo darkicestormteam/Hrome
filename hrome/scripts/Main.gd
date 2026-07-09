@@ -28,6 +28,8 @@ var gm: Node
 
 func _ready() -> void:
 	gm = get_node("/root/GameManager")
+	# Всегда реагируем на ввод, даже когда дерево на паузе (экран Game Over).
+	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	var viewport_size: Vector2 = get_viewport_rect().size
 	core.global_position = viewport_size / 2.0
@@ -98,6 +100,8 @@ func _on_play_button_pressed() -> void:
 	core.process_mode = Node.PROCESS_MODE_INHERIT
 	spawner.process_mode = Node.PROCESS_MODE_INHERIT
 	gm.reset_game()
+	if spawner.has_node("SpawnTimer"):
+		spawner.spawn_timer.start()
 
 
 func _on_menu_settings_pressed() -> void:

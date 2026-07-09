@@ -1,22 +1,36 @@
 [gd_scene format=3 uid="uid://dk0qdak6ox3qx"]
 
 [ext_resource type="Script" uid="uid://dtyrdqv30tnvo" path="res://scripts/Orb.gd" id="1_2pvil"]
-[ext_resource type="Texture2D" uid="uid://boit38fv1e5o" path="res://icon.svg" id="2_x580g"]
+[ext_resource type="Texture2D" uid="uid://bwdgopxdlfjht" path="res://assets/orb.png" id="2_x580g"]
+[ext_resource type="Curve" uid="uid://dx2x83tsy44po" path="res://scenes/orb_trail_width.tres" id="3_srlfe"]
+[ext_resource type="Gradient" uid="uid://bgybooo30y0hw" path="res://scenes/orb_trail_gradient.gradient.tres" id="4_5oftt"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_16fcm"]
+blend_mode = 1
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_x580g"]
 radius = 15.0
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_srlfe"]
+blend_mode = 1
+
 [node name="Orb" type="Area2D" unique_id=487193053]
+scale = Vector2(1.4, 1.4)
 script = ExtResource("1_2pvil")
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=1373831216]
-scale = Vector2(0.3, 0.3)
+material = SubResource("CanvasItemMaterial_16fcm")
+scale = Vector2(0.056873936, 0.056873936)
 texture = ExtResource("2_x580g")
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=1244855192]
 shape = SubResource("CircleShape2D_x580g")
 
 [node name="Trail" type="Line2D" parent="." unique_id=1576551239]
-width = 4.0
-joint_mode = 1
-end_cap_mode = 1
+material = SubResource("CanvasItemMaterial_srlfe")
+width = 30.0
+width_curve = ExtResource("3_srlfe")
+default_color = Color(0.047058824, 0.047058824, 1, 1)
+gradient = ExtResource("4_5oftt")
+joint_mode = 2
+end_cap_mode = 2

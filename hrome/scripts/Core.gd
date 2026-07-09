@@ -3,7 +3,7 @@ extends Node2D
 ## Шары уничтожаются при касании сектора (через area_entered).
 ## Тип сектора определяет результат (цвет/стык).
 
-@onready var visual: Node2D = $Visual
+@onready var visual: Node2D = $Visual/CoreSprite
 
 const HIT_EFFECT: PackedScene = preload("res://scenes/HitEffect.tscn")
 
@@ -11,6 +11,9 @@ var target_angle: float = 0.0
 const ROTATION_SPEED: float = 20.0
 
 var audio: Node
+
+# Базовый масштаб ядра из инспектора (чтобы пульсация не затирала его).
+var base_scale: Vector2 = Vector2(1.0, 1.0)
 
 ## Тип каждого сектора по имени узла Area2D.
 const SECTOR_TYPES: Dictionary = {
@@ -26,9 +29,10 @@ const SECTOR_TYPES: Dictionary = {
 func _ready() -> void:
 	add_to_group("core")
 	audio = get_node("/root/AudioManager")
+	base_scale = visual.scale
 
 	# Подключаем сигналы столкновения на каждом секторе-области.
-	var hex: Node = visual.get_node_or_null("HexVisual")
+	var hex: Node = get_node_or_null("Visual/HexVisual")
 	if hex != null:
 		for sector: Node in hex.get_children():
 			if sector is Area2D:
@@ -43,6 +47,11 @@ func _input(event: InputEvent) -> void:
 
 func _process(delta: float) -> void:
 	rotation = lerp_angle(rotation, target_angle, ROTATION_SPEED * delta)
+
+	# Пульсация масштаба визуала — ядро «дышит» (не конфликтует с тряской
+	# позиции в _shake_visual и с rotation на корне Core).
+	var pulse: float = 1.0 + sin(Time.get_ticks_msec() * 0.005) * 0.03
+	visual.scale = base_scale * pulse
 
 
 func _on_sector_area_entered(orb: Area2D, sector_name: String) -> void:
