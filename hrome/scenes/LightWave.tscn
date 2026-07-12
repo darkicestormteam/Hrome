@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://defbkqcogke2f"]
+
+[ext_resource type="Script" uid="uid://dbvx1x24n4qqj" path="res://scripts/LightWave.gd" id="1_d8utf"]
+
+[node name="LightWave" type="Sprite2D" unique_id=256544759]
+script = ExtResource("1_d8utf")

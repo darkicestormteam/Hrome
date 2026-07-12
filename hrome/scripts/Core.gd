@@ -70,7 +70,7 @@ func _on_sector_area_entered(orb: Area2D, sector_name: String) -> void:
 func _resolve_hit(orb_color: String, sector_type: String, pos: Vector2) -> void:
 	var gm: Node = get_node("/root/GameManager")
 
-	# 1. СТЫК (серый сектор)
+	# 1. СТЫК (серый сектор) — НЕ сбрасывает комбо
 	if sector_type == "gap":
 		if orb_color == "black":
 			gm.add_score(50)
@@ -80,6 +80,7 @@ func _resolve_hit(orb_color: String, sector_type: String, pos: Vector2) -> void:
 		else:
 			_spawn_hit_effect(pos, _orb_color_to_color(orb_color))
 			audio.play_sfx("gap")
+		gm.register_combo_gap_hit()
 		return
 
 	# 2. ЦВЕТНАЯ грань
@@ -88,15 +89,19 @@ func _resolve_hit(orb_color: String, sector_type: String, pos: Vector2) -> void:
 		_shake_visual(16.0)
 		_spawn_hit_effect(pos, Color.RED)
 		audio.play_sfx("damage")
+		if gm.combo_active:
+			gm._fail_combo()
 	elif sector_type == orb_color:
 		gm.add_score(10)
 		_spawn_hit_effect(pos, _orb_color_to_color(orb_color))
 		audio.play_sfx("absorb")
+		gm.register_combo_hit(orb_color)
 	else:
 		gm.take_damage()
 		_shake_visual(8.0)
 		_spawn_hit_effect(pos, Color.RED)
 		audio.play_sfx("damage")
+		gm._fail_combo()
 
 
 func _orb_color_to_color(color_name: String) -> Color:
