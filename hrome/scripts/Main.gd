@@ -314,6 +314,7 @@ func _on_combo_timer_tick(time_left: float) -> void:
 
 
 func _on_combo_failed() -> void:
+	combo_ui.visible = false
 	for slot_data in combo_slots:
 		if slot_data.holder.visible:
 			var sty_red := StyleBoxFlat.new()

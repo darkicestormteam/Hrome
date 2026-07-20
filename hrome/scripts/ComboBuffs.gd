@@ -35,30 +35,26 @@ func _ready() -> void:
 func activate_shield(core: Node2D) -> void:
 	if shield_timer.time_left > 0:
 		shield_timer.stop()
-		var old := core.get_node_or_null("ComboShield")
-		if old:
-			old.queue_free()
 
-	var shield := Sprite2D.new()
-	shield.name = "ComboShield"
-	shield.texture = preload("res://assets/orb.png")
-	shield.scale = Vector2(3, 3)
-	shield.modulate = Color(0.3, 0.6, 1.0, 0.4)
-	var mat := CanvasItemMaterial.new()
-	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	shield.material = mat
-	core.add_child(shield)
+	# Включаем ShieldArea (нода уже есть в Core.tscn)
+	var shield_area: Area2D = core.get_node("ShieldArea")
+	if shield_area and shield_area.has_method("set_active"):
+		shield_area.set_active(true)
+
 	shield_timer.start(SHIELD_DURATION)
 
 
 func _on_shield_end() -> void:
-	var shield := get_node_or_null("/root/GameManager/../Main/Core/ComboShield")
-	if shield:
-		shield.queue_free()
+	var shield_area := get_node_or_null("/root/GameManager/../Main/Core/ShieldArea")
+	if shield_area and shield_area.has_method("set_active"):
+		shield_area.set_active(false)
 
 
 func is_shield_active() -> bool:
-	return shield_timer.time_left > 0
+	var shield_area := get_node_or_null("/root/GameManager/../Main/Core/ShieldArea")
+	if shield_area:
+		return shield_area.shield_active
+	return false
 
 
 func activate_slowmo() -> void:
@@ -93,7 +89,6 @@ func activate_monochrome(target_color: String) -> void:
 
 
 func _on_monochrome_end() -> void:
-	# Орбы продолжают лететь со своими цветами — сброс не нужен
 	pass
 
 

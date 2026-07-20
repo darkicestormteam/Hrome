@@ -55,6 +55,7 @@ var game_state: GameState = GameState.MENU
 const SECTOR_DURATION: float = 45.0
 
 var sector_timer: Timer
+var combo_cooldown_timer: Timer
 
 # --- Цветовое Комбо (Sequence) ---
 var combo_active: bool = false
@@ -89,6 +90,13 @@ func _ready() -> void:
 	sector_timer.timeout.connect(_on_sector_timer_timeout)
 	add_child(sector_timer)
 
+	combo_cooldown_timer = Timer.new()
+	combo_cooldown_timer.name = "ComboCooldownTimer"
+	combo_cooldown_timer.wait_time = 30.0
+	combo_cooldown_timer.one_shot = true
+	combo_cooldown_timer.timeout.connect(_on_combo_cooldown_timeout)
+	add_child(combo_cooldown_timer)
+
 	buffs = Node.new()
 	buffs.name = "ComboBuffs"
 	buffs.set_script(preload("res://scripts/ComboBuffs.gd"))
@@ -100,19 +108,49 @@ func _process(delta: float) -> void:
 		combo_timer -= delta
 		combo_timer_tick.emit(combo_timer)
 		if combo_timer <= 0.0:
-			_fail_combo()
+			_fail_combo(true)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		match event.keycode:
+			KEY_1:
+				_execute_reward("shield")
+			KEY_2:
+				_execute_reward("shockwave")
+			KEY_3:
+				_execute_reward("slowmo")
+			KEY_4:
+				_execute_reward("score1000")
+			KEY_5:
+				_execute_reward("hp")
+			KEY_6:
+				_execute_reward("monochrome")
 
 
 func _on_sector_timer_timeout() -> void:
 	current_sector += 1
 
-	if current_sector == 1:
-		combo_active = true
+	# Обновляем tier для следующего комбо, но текущее не трогаем
+	if current_sector == 1 and not combo_active and combo_cooldown_timer.time_left <= 0:
 		combo_tier = 3
+		combo_active = true
 		_roll_new_combo()
 	elif current_sector == 2:
 		combo_tier = 4
-		_roll_new_combo()
+
+
+func _start_combo_cooldown() -> void:
+	combo_active = false
+	combo_failed.emit()
+	combo_cooldown_timer.start()
+
+
+func _on_combo_cooldown_timeout() -> void:
+	combo_active = true
+	_roll_new_combo()
+	# Принудительно показываем UI (на случай, если _roll_new_combo не сработал)
+	combo_updated.emit(combo_sequence, combo_progress, combo_tier)
 
 
 func _roll_new_combo() -> void:
@@ -141,10 +179,10 @@ func register_combo_hit(orb_color: String) -> void:
 
 	if combo_progress < combo_sequence.size() and orb_color == combo_sequence[combo_progress]:
 		combo_progress += 1
-		combo_timer = COMBO_TIME_LIMIT  # сброс таймера при успешном попадании
+		combo_timer += 3.0  # прибавляем 3 секунды за правильное попадание
 		if combo_progress >= combo_tier:
 			_execute_reward(combo_reward)
-			_roll_new_combo()
+			_start_combo_cooldown()
 		else:
 			combo_updated.emit(combo_sequence, combo_progress, combo_tier)
 	else:
@@ -155,13 +193,19 @@ func register_combo_gap_hit() -> void:
 	pass
 
 
-func _fail_combo() -> void:
+func _fail_combo(is_timeout: bool = false) -> void:
 	if not combo_active:
 		return
-	combo_progress = 0
-	combo_timer = 0.0
-	combo_failed.emit()
-	_roll_new_combo()
+
+	if is_timeout:
+		# Время вышло — комбо провалено окончательно, запускаем кулдаун
+		combo_progress = 0
+		_start_combo_cooldown()
+	else:
+		# Игрок промахнулся цветом — сбрасываем прогресс, но комбо и таймер остаются
+		combo_progress = 0
+		# Обновляем UI, но НЕ эмитим combo_failed, чтобы UI не скрылся
+		combo_updated.emit(combo_sequence, combo_progress, combo_tier)
 
 
 func _execute_reward(reward: String) -> void:
@@ -207,6 +251,10 @@ func reset_game() -> void:
 	sector_timer.start()
 	var audio: Node = get_node("/root/AudioManager")
 	audio.play_music()
+
+	# Сбрасываем кулдаун, если он был активен
+	if combo_cooldown_timer.time_left > 0:
+		combo_cooldown_timer.stop()
 
 	combo_active = true
 	combo_tier = 3
